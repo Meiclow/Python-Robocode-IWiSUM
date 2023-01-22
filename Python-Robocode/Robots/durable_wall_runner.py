@@ -121,7 +121,6 @@ class WallRunnerDurable(Robot):
                 self.fire(BULLET_POWER)
 
     def get_counter(self):
-        print(self.counter)
         self.counter += 1
         return self.counter
 
