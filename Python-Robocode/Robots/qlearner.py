@@ -35,11 +35,18 @@ class QLearner:
             [0, 1],      # fire
         ]
         try:
+            print("Loading knowledge")
             with open('knowledge.pickle', 'rb') as f:
                 self.Q = pickle.load(f)
-        except:
+        except Exception as ex:
+            print(f"Exception loading knowledge: {ex}")
             self.Q = defaultdict(lambda: defaultdict(int))
         self.epsilon = epsilon
+
+    def __del__(self):
+        print("Saving knowledge")
+        with open('knowledge.pickle', 'wb') as f:
+            pickle.dump(self.Q, f)
 
     def discretise(self, observation):
         # observation should be [map_x, map_y, bot_rotation, radar_rotation, enemy detected]
@@ -57,8 +64,7 @@ class QLearner:
 
     def update_knowledge(self, action, observation, reward):
         self.Q[observation][action] = (1 - ALPHA) * self.Q[observation][action] + ALPHA * reward
-        with open('knowledge.pickle', 'wb') as f:
-            pickle.dump(self.Q, f)
+        
         pass
 
     def random_action(self):
@@ -138,7 +144,9 @@ class QLearningBot(Robot): #Create a Robot
         pass
         
     def onRobotDeath(self):#NECESARY FOR THE GAME
-        pass
+        print("Saving knowledge")
+        with open('knowledge.pickle', 'wb') as f:
+                pickle.dump(self.qlearner.Q, f)
     
     def onTargetSpotted(self, botId, botName, botPos, _=None):#NECESARY FOR THE GAME
         self.spotted = 1
