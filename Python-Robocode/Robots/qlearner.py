@@ -1,7 +1,7 @@
 
 from robot import Robot #Import a base Robot
 
-
+import dill as pickle
 import math
 import numpy as np
 from random import choice
@@ -34,7 +34,11 @@ class QLearner:
             [-1, 0, 1],  # gunTurn
             [0, 1],      # fire
         ]
-        self.Q = defaultdict(lambda: defaultdict(int))
+        try:
+            with open('knowledge.pickle', 'rb') as f:
+                self.Q = pickle.load(f)
+        except:
+            self.Q = defaultdict(lambda: defaultdict(int))
         self.epsilon = epsilon
 
     def discretise(self, observation):
@@ -53,6 +57,8 @@ class QLearner:
 
     def update_knowledge(self, action, observation, reward):
         self.Q[observation][action] = (1 - ALPHA) * self.Q[observation][action] + ALPHA * reward
+        with open('knowledge.pickle', 'wb') as f:
+            pickle.dump(self.Q, f)
         pass
 
     def random_action(self):
